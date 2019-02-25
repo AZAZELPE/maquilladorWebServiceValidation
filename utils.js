@@ -41,7 +41,7 @@ const getHeadersFromUrl = async (url) => {
   })
 }
 
-const isImageFromUrlAlive = async (url) => {
+const isUrlAlive = async (url, type) => {
   let imgHeaders;
 
   try {
@@ -53,18 +53,18 @@ const isImageFromUrlAlive = async (url) => {
   //if(!(imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf("image") != -1))
   //  console.log(imgHeaders);
 
-  return (imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf("image") != -1)
+  return (imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf(type) != -1)
 }
 
-const getInactiveUrlsFromImgArray = async (imgArray) => {
+const getInactiveUrlsFromArray = async (array, type) => {
   const bar1 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
-  const cantidadDatos = imgArray.length;
+  const cantidadDatos = array.length;
 
   bar1.start(cantidadDatos, 0);
 
-  let result = imgArray.map((x,i)=>{
+  let result = array.map((x,i)=>{
     bar1.update(i);
-    return isImageFromUrlAlive(x.val)
+    return isUrlAlive(x.val, type)
   })
 
   bar1.update(cantidadDatos);
@@ -72,7 +72,7 @@ const getInactiveUrlsFromImgArray = async (imgArray) => {
 
   result = await Promise.all(result);
   
-  return imgArray.map((x,i)=>{ return {id: x.id, url: x.val, alive: result[i]} })
+  return array.map((x,i)=>{ return {id: x.id, url: x.val, alive: result[i]} })
                 .filter((x)=>{return x.alive == false});
               
 }
@@ -129,6 +129,6 @@ module.exports.countByName = countByName;
 module.exports.deleteDuplicates = deleteDuplicates;
 module.exports.getDuplicates = getDuplicates;
 module.exports.statusTrueFilter = statusTrueFilter;
-module.exports.getInactiveUrlsFromImgArray = getInactiveUrlsFromImgArray;
+module.exports.getInactiveUrlsFromArray = getInactiveUrlsFromArray;
 module.exports.stringify = stringify;
 

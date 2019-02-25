@@ -1,7 +1,7 @@
 const {getWrongOnes, getAttribute, 
       getDuplicates, statusTrueFilter,
       getData, countByName,
-      getInactiveUrlsFromImgArray,
+      getInactiveUrlsFromArray,
       stringify, getGoodOnes} = require('./utils');
 
 const url = process.argv[2];
@@ -56,6 +56,7 @@ let main = async () => {
   console.log(`-> Solo ${tones.length} productos tienen tonos`);
   console.log(`-> Generando ${statusTrueTones.length} tonos en total con estado "true"`);
 
+
   console.log('\n\nValidaciones Producto:')
   console.log(`-> Con nombre duplicado:\t${productDuplicate.length}`);
   console.log(`-> Sin product image url:\t${productImages.filter(getWrongOnes).length}`);
@@ -74,13 +75,18 @@ let main = async () => {
   console.log(`-> Sin tone SKU:\t${toneSku.filter(getWrongOnes).length}`);  
   console.log(`-> Sin tone CUV:\t${toneCuv.filter(getWrongOnes).length}`);  
 
+
   console.log(`\n\nValidación de URLS:`);
-  console.log('-> Url Productos')
-  const inactiveImgProducts = await getInactiveUrlsFromImgArray(productImages.filter(getGoodOnes));
+  console.log('-> Url Imagen Productos')
+  const inactiveImgProducts = await getInactiveUrlsFromArray(productImages.filter(getGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgProducts.length}`);
-  console.log('-> Url Tonos')
-  const inactiveImgTones = await getInactiveUrlsFromImgArray(toneImages.filter(getGoodOnes));
+  console.log('-> Url Imagen Tonos')
+  const inactiveImgTones = await getInactiveUrlsFromArray(toneImages.filter(getGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgTones.length}`);
+  console.log('-> Url Ecommerce Tonos')
+  const inactiveUrlTones = await getInactiveUrlsFromArray(toneUrl.filter(getGoodOnes),'html');
+  console.log(`-> -> cantidad de urls inactivas:\t${inactiveUrlTones.length}`);
+
 
   console.log("\n\nMas detalles:")
   console.log("productDuplicate:" + stringify(productDuplicate));
@@ -96,6 +102,8 @@ let main = async () => {
   console.log("toneCuv:" + stringify(toneCuv.filter(getWrongOnes)));
   console.log("productUrlInactivas:" + stringify(inactiveImgProducts));
   console.log("tonesUrlInactivas:" + stringify(inactiveImgTones));
+  console.log("tonesUrlInactivas:" + stringify(inactiveUrlTones));
+  
 
 }
 
