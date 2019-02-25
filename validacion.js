@@ -4,20 +4,30 @@ const {getWrongOnes, getAttribute,
       getInactiveUrlsFromArray,
       stringify, getGoodOnes} = require('./utils');
 
-const url = process.argv[2];
+const urlProducts = process.argv[2];
+const urlCategories = urlProducts.replace('3005','3003').slice(0,urlProducts.length-2)
 
 let main = async () => {
+  console.log('URL Categorias: ' + urlCategories);
+  console.log('URL Productos: ' + urlProducts);
+  
+  const dataCategories = await getData(urlCategories);
+  const dataProducts = await getData(urlProducts);
+  console.log('Esta función realizará la validación de la data del servicio.');
 
-  let data = await getData(url);
-  console.log('Esta función realizará la validación de la data del servicio.')
-
-  //Array List of Products and Tones Generation: (statusTrueProducts && statusTrueTones)
-  const statusTrueProducts = data.filter(statusTrueFilter);
+  //Array List of Categories Products and Tones Generation: (statusTrueProducts && statusTrueTones)
+  const statusTrueCategories = dataCategories.filter(statusTrueFilter);
+  const statusTrueProducts = dataProducts.filter(statusTrueFilter);
   const tones = statusTrueProducts.map(x=>getAttribute(x)('tones'))
                                   .map(x=>x.val)
                                   .filter(x=>x.length>0);
   const tones1array = [].concat.apply([], tones);
   const statusTrueTones = tones1array.filter(statusTrueFilter);
+
+  //Categories validations:
+  const categoriesName = statusTrueCategories.map(x=>getAttribute(x)('name'));
+  const categoriesImage = statusTrueCategories.map(x=>getAttribute(x)('image'));
+  const categoriesCountry = statusTrueCategories.map(x=>getAttribute(x)('country'));
 
 
   //Products validations:
@@ -51,11 +61,17 @@ let main = async () => {
                                                     'colorImage': toneColorImage.filter(y=>y.id==x)}});
 
   console.log('\n\nValidaciones Generales:')
+  console.log(`-> Se tienen ${dataCategories.length} categorias`);
+  console.log(`-> De los cuales solo ${statusTrueCategories.length} tiene como estado "true"`);
   console.log(`-> Se tiene ${productsName.length} productos`);
   console.log(`-> De los cuales solo ${statusTrueProducts.length} tiene como estado "true"`);
   console.log(`-> Solo ${tones.length} productos tienen tonos`);
   console.log(`-> Generando ${statusTrueTones.length} tonos en total con estado "true"`);
 
+  console.log('\n\nValidaciones Categoria:')
+  console.log(`-> Sin nombre:\t${categoriesName.filter(getWrongOnes).length}`);
+  console.log(`-> Sin imagen:\t${categoriesImage.filter(getWrongOnes).length}`);
+  console.log(`-> Sin pais:\t${categoriesCountry.filter(getWrongOnes).length}`);
 
   console.log('\n\nValidaciones Producto:')
   console.log(`-> Con nombre duplicado:\t${productDuplicate.length}`);
@@ -77,6 +93,9 @@ let main = async () => {
 
 
   console.log(`\n\nValidación de URLS:`);
+  console.log('-> Url Imagen Categorias')
+  const inactiveImgCategories = await getInactiveUrlsFromArray(categoriesImage.filter(getGoodOnes),'image');
+  console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgCategories.length}`);
   console.log('-> Url Imagen Productos')
   const inactiveImgProducts = await getInactiveUrlsFromArray(productImages.filter(getGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgProducts.length}`);
@@ -89,6 +108,9 @@ let main = async () => {
 
 
   console.log("\n\nMas detalles:")
+  console.log("categoriesName:" + stringify(categoriesName.filter(getWrongOnes)));
+  console.log("categoriesImage:" + stringify(categoriesImage.filter(getWrongOnes)));
+  console.log("categoriesCountry:" + stringify(categoriesCountry.filter(getWrongOnes)));
   console.log("productDuplicate:" + stringify(productDuplicate));
   console.log("productImages:" + stringify(productImages.filter(getWrongOnes)));
   console.log("productSku:" + stringify(productSku.filter(getWrongOnes)));
