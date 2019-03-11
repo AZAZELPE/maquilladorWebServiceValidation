@@ -53,7 +53,10 @@ const isUrlAlive = async (url, type) => {
   //if(!(imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf("image") != -1))
   //  console.log(imgHeaders);
 
-  return (imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf(type) != -1)
+
+
+  return {estado: (imgHeaders['HTTP']=='200' && imgHeaders['CONTENT-TYPE'].indexOf(type) != -1),
+          http: imgHeaders['HTTP'] }
 }
 
 const getInactiveUrlsFromArray = async (array, type) => {
@@ -72,7 +75,7 @@ const getInactiveUrlsFromArray = async (array, type) => {
 
   result = await Promise.all(result);
   
-  return array.map((x,i)=>{ return {id: x.id, url: x.val, alive: result[i]} })
+  return array.map((x,i)=>{ return {id: x.id, url: x.val, alive: result[i].estado, http: result[i].http } })
                 .filter((x)=>{return x.alive == false});
               
 }
@@ -105,6 +108,18 @@ const getWrongOnes = (x) => {
   return result;
 }
 
+const getUrlWrongOnes = (x) => { 
+  let result = true;
+  x = x.val;
+  if(typeof(x)=='string') {
+    result = (x == undefined ||  x == null || x.trim() == "" || x.substr(0,4).toUpperCase()!='HTTP');
+  } else if (typeof(x)=='number') {
+    result = (x == undefined ||  x == null || x < 1);
+  }
+  
+  return result;
+}
+
 const getGoodOnes = (x) => { 
   let result = true;
   x = x.val;
@@ -117,13 +132,28 @@ const getGoodOnes = (x) => {
   return result;
 }
 
+const getUrlGoodOnes = (x) => { 
+  let result = true;
+  x = x.val;
+  if(typeof(x)=='string') {
+    result = (x != undefined &&  x != null && x.trim() != "" && x.substr(0,4).toUpperCase()=='HTTP');
+  } else if (typeof(x)=='number') {
+    result = (x != undefined &&  x != null && x > 0);
+  }
+  
+  return result;
+}
+
+
 const statusTrueFilter = (x) => { return x.status == true; }
 
 const stringify = (x) => { return JSON.stringify(x,null,4) }
 
 module.exports.getAttribute = getAttribute;
 module.exports.getWrongOnes = getWrongOnes;
+module.exports.getUrlWrongOnes = getUrlWrongOnes;
 module.exports.getGoodOnes = getGoodOnes;
+module.exports.getUrlGoodOnes = getUrlGoodOnes;
 module.exports.getData = getData;
 module.exports.countByName = countByName;
 module.exports.deleteDuplicates = deleteDuplicates;

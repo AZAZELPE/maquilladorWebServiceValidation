@@ -1,11 +1,13 @@
-const {getWrongOnes, getAttribute, 
+const {getWrongOnes, getUrlWrongOnes, 
+      getAttribute, getUrlGoodOnes,
       getDuplicates, statusTrueFilter,
       getData, countByName,
       getInactiveUrlsFromArray,
       stringify, getGoodOnes} = require('./utils');
 
 const urlProducts = process.argv[2];
-const urlCategories = urlProducts.replace('3005','3003').slice(0,urlProducts.length-2)
+let urlCategories = urlProducts.replace('3005','3003').slice(0,urlProducts.length-2)
+urlCategories = urlProducts.replace('3006','3003').slice(0,urlProducts.length-2)
 
 let main = async () => {
   console.log('URL Categorias: ' + urlCategories);
@@ -70,12 +72,12 @@ let main = async () => {
 
   console.log('\n\nValidaciones Categoria:')
   console.log(`-> Sin nombre:\t${categoriesName.filter(getWrongOnes).length}`);
-  console.log(`-> Sin imagen:\t${categoriesImage.filter(getWrongOnes).length}`);
+  console.log(`-> Sin imagen:\t${categoriesImage.filter(getUrlWrongOnes).length}`);
   console.log(`-> Sin pais:\t${categoriesCountry.filter(getWrongOnes).length}`);
 
   console.log('\n\nValidaciones Producto:')
   console.log(`-> Con nombre duplicado:\t${productDuplicate.length}`);
-  console.log(`-> Sin product image url:\t${productImages.filter(getWrongOnes).length}`);
+  console.log(`-> Sin product image url:\t${productImages.filter(getUrlWrongOnes).length}`);
   console.log(`-> Sin SKU:\t${productSku.filter(getWrongOnes).length}`);  
   console.log(`-> Sin CUV:\t${productCuv.filter(getWrongOnes).length}`);  
 
@@ -83,7 +85,7 @@ let main = async () => {
   console.log('\n\nValidaciones Producto->Tonos:')
   console.log(`-> Sin tone name:\t${toneName.filter(getWrongOnes).length}`);
   console.log(`-> Sin tone image:\t${toneImages.filter(getWrongOnes).length}`);
-  console.log(`-> Sin tone url:\t${toneUrl.filter(getWrongOnes).length}`);
+  console.log(`-> Sin tone url:\t${toneUrl.filter(getUrlWrongOnes).length}`);
   console.log(`-> Sin tone price:\t${tonePriceNew.filter(getWrongOnes).length}`);
   console.log(`-> Sin tone colorCode:\t${toneColorCode.filter(getWrongOnes).length}`);
   console.log(`-> Sin tone colorImage:\t${toneColorImage.filter(getWrongOnes).length}`);
@@ -91,32 +93,31 @@ let main = async () => {
   console.log(`-> Sin tone SKU:\t${toneSku.filter(getWrongOnes).length}`);  
   console.log(`-> Sin tone CUV:\t${toneCuv.filter(getWrongOnes).length}`);  
 
-
   console.log(`\n\nValidación de URLS:`);
   console.log('-> Url Imagen Categorias')
-  const inactiveImgCategories = await getInactiveUrlsFromArray(categoriesImage.filter(getGoodOnes),'image');
+  const inactiveImgCategories = await getInactiveUrlsFromArray(categoriesImage.filter(getUrlGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgCategories.length}`);
   console.log('-> Url Imagen Productos')
-  const inactiveImgProducts = await getInactiveUrlsFromArray(productImages.filter(getGoodOnes),'image');
+  const inactiveImgProducts = await getInactiveUrlsFromArray(productImages.filter(getUrlGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgProducts.length}`);
   console.log('-> Url Imagen Tonos')
-  const inactiveImgTones = await getInactiveUrlsFromArray(toneImages.filter(getGoodOnes),'image');
+  const inactiveImgTones = await getInactiveUrlsFromArray(toneImages.filter(getUrlGoodOnes),'image');
   console.log(`-> -> cantidad de urls inactivas:\t${inactiveImgTones.length}`);
-  console.log('-> Url Ecommerce Tonos')
-  const inactiveUrlTones = await getInactiveUrlsFromArray(toneUrl.filter(getGoodOnes),'html');
-  console.log(`-> -> cantidad de urls inactivas:\t${inactiveUrlTones.length}`);
+  //console.log('-> Url Ecommerce Tonos')
+  //const inactiveUrlTones = await getInactiveUrlsFromArray(toneUrl.filter(getGoodOnes),'html');
+  //console.log(`-> -> cantidad de urls inactivas:\t${inactiveUrlTones.length}`);
 
 
   console.log("\n\nMas detalles:")
   console.log("categoriesName:" + stringify(categoriesName.filter(getWrongOnes)));
-  console.log("categoriesImage:" + stringify(categoriesImage.filter(getWrongOnes)));
+  console.log("categoriesImage:" + stringify(categoriesImage.filter(getUrlWrongOnes)));
   console.log("categoriesCountry:" + stringify(categoriesCountry.filter(getWrongOnes)));
   console.log("productDuplicate:" + stringify(productDuplicate));
-  console.log("productImages:" + stringify(productImages.filter(getWrongOnes)));
+  console.log("productImages:" + stringify(productImages.filter(getUrlWrongOnes)));
   console.log("productSku:" + stringify(productSku.filter(getWrongOnes)));
   console.log("productCuv:" + stringify(productCuv.filter(getWrongOnes)));
   console.log("toneName:" + stringify(toneName.filter(getWrongOnes)));
-  console.log("toneImages:" + stringify(toneImages.filter(getWrongOnes)));
+  console.log("toneImages:" + stringify(toneImages.filter(getUrlWrongOnes)));
   console.log("toneUrl:" + stringify(toneUrl.filter(getWrongOnes)));
   console.log("tonePriceNew:" + stringify(tonePriceNew.filter(getWrongOnes)));
   console.log("toneColor Image&Color Overlapping:" + stringify(overlapingToneColors));
@@ -124,7 +125,7 @@ let main = async () => {
   console.log("toneCuv:" + stringify(toneCuv.filter(getWrongOnes)));
   console.log("productUrlInactivas:" + stringify(inactiveImgProducts));
   console.log("tonesUrlInactivas:" + stringify(inactiveImgTones));
-  console.log("tonesUrlInactivas:" + stringify(inactiveUrlTones));
+  //console.log("tonesUrlInactivas:" + stringify(inactiveUrlTones));
   
 
 }
